@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.361">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>bikeR</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="bikeR_files/libs/clipboard/clipboard.min.js"></script>
+<script src="bikeR_files/libs/quarto-html/quarto.js"></script>
+<script src="bikeR_files/libs/quarto-html/popper.min.js"></script>
+<script src="bikeR_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="bikeR_files/libs/quarto-html/anchor.min.js"></script>
+<link href="bikeR_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="bikeR_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="bikeR_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="bikeR_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="bikeR_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="bikeR_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="bikeR_files/libs/tabwid-1.1.3/tabwid.js"></script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">bikeR</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="ask" class="level2">
+<h2 class="anchored" data-anchor-id="ask">ASK</h2>
+<p><strong>Guiding questions:</strong></p>
+<p><em>What is the problem you are trying to solve?</em></p>
+<p><strong>A:</strong> To find out the key difference between annual members from casual users.</p>
+<p><em>How can your insights drive business decisions?</em></p>
+<p><strong>A:</strong> It will help to find the key differentiations in order to get insights on how to mutate the casuals into annuals. Maybe it will be a simple matter.&nbsp;</p>
+<p><strong>Key tasks</strong></p>
+<p><em>1. Identify the business task</em></p>
+<p><strong>A:</strong> To figure out insights on how to convey casual users into annual members.</p>
+<p><em>2. Consider key stakeholders</em></p>
+<p><strong>A:</strong> Moreno and Cyclistc Executive Team.</p>
+<p><strong>Deliverable</strong></p>
+<ul>
+<li>A clear statement of the business task</li>
+</ul>
+<p><strong>A:</strong> <strong><em>Diferentiate casual from member riders.</em></strong></p>
+</section>
+<section id="prepare" class="level2">
+<h2 class="anchored" data-anchor-id="prepare">PREPARE</h2>
+<p><strong>Guiding questions</strong></p>
+<p><em>Where is your data located?</em></p>
+<p><strong>A:</strong> https://divvy-tripdata.s3.amazonaws.com/index.html The data has been made available by Motivate International Inc.</p>
+<p><em>How is the data organized?</em></p>
+<p><strong>A:</strong> Within the above link, there are a lot of zip files. I notice some data was as a ride table monthly divided with names like: “YYYYMM-divvy-tripdata.zip” in which the table have an id from each ride, but few or none information on the users except their type. Continuing there are this another kind of name: “Divvy_Stations_Trips_YYYY_QXQZ.zip”, for the semester (two quarters), other with only quarters from 2018 to 2020 and finnaly the “Divvy_Stations_Trips_2013.zip” containing two tables: trips in 2013 and stations. Within this last file, there is a RESUME.txt file containing the following tables descriptions:</p>
+<p>The tables:</p>
+<p>**Metadata for Trips Table:</p>
+<p>Variables:</p>
+<ul>
+<li>trip_id: ID attached to each trip taken</li>
+<li>starttime: day and time trip started, in CST</li>
+<li>stoptime: day and time trip ended, in CST</li>
+<li>bikeid: ID attached to each bike</li>
+<li>tripduration: time of trip in seconds</li>
+<li>from_station_name: name of station where trip originated</li>
+<li>to_station_name: name of station where trip terminated</li>
+<li>from_station_id: ID of station where trip originated</li>
+<li>to_station_id: ID of station where trip terminated usertype: “Customer” is a rider who purchased a 24-Hour Pass; “Subscriber” is a rider who purchased an Annual Membership</li>
+<li>gender: gender of rider</li>
+<li>birthyear: birth year of rider</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>First row contains column names</li>
+<li>Total records = 905,699</li>
+<li>Trips that did not include a start or end date were removed from original table.</li>
+<li>Gender and birthday are only available for Subscribers</li>
+</ul>
+<p>Metadata for Stations table:</p>
+<p>Variables:</p>
+<ul>
+<li>name: station name<br>
+</li>
+<li>latitude: station latitude</li>
+<li>longitude: station longitude</li>
+<li>dpcapacity: number of total docks at each station as of 8/20/2014 online</li>
+<li>date: date the station went live in the system</li>
+</ul>
+<p>I decided to import the most recent station table in the file “Divvy_Stations_2017_Q3Q4.csv” and the trips from 2015 to 2017 to keep in pace with the stations data.</p>
+<p>To do so, I create a folder named “import” to gather all the files to be imported.</p>
+<p>Are there issues with bias or credibility in this data? Does your data ROCCC? <strong>A:</strong> Yes, there are credibility and the ROCCC parameters are in compliance.</p>
+<ul>
+<li><p>Reliable: The data source is not biased because is collected from the devices.</p></li>
+<li><p>Original: The data was generated from a known source to this course.</p></li>
+<li><p>Comprehensive: The data contains all elements to get to the solution.</p></li>
+<li><p>Current: For the present purpose, the data is quite current.</p></li>
+<li><p>Cited: The data is public under a public licence.</p></li>
+</ul>
+<p><em>How are you addressing licensing, privacy, security, and accessibility?</em><br>
+<strong>A:</strong> No problem since, the data has only birthday information on the subjects. Overall it is a public database.</p>
+<p><br>
+<em>How did you verify the data’s integrity?</em><br>
+<strong>A:</strong> Just understanding it is collected from the devices and the integrity is preserved though cause there is no biased filtering for instance.</p>
+<p><em>How does it help you answer your question?</em><br>
+<strong>A:</strong> Specially the trip table, will help to understand the patterns on the rider?</p>
+<p><em>Are there any problems with the data?</em></p>
+<p><strong>A:</strong> Not so far until now.</p>
+</section>
+<section id="process" class="level2">
+<h2 class="anchored" data-anchor-id="process">PROCESS</h2>
+<p><em>What tools are you choosing and why?</em></p>
+<p><strong>A:</strong> I will use R with RStudio because there are a lot of data and the files from 2015 to 2017 results in a huge data base to be treated in worksheets.</p>
+<p><em>Have you ensured your data’s integrity?</em></p>
+<p><strong>A:</strong> I notice there is now data able to identify users and the information collectors only exclude those not using the bikes. So, no bias at all.</p>
+<p><em>What steps have you taken to ensure that your data is clean and ready to analyse?</em></p>
+<p><strong>A:</strong> The cleaning process described bellow.</p>
+<p><em>Have you documented your cleaning process so you can review and share those results?</em></p>
+<p><strong>A:</strong> Yes.</p>
+<section id="documentation-on-cleaning-data" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-on-cleaning-data">Documentation on Cleaning Data</h3>
+<section id="r-libraries-to-be-used" class="level4">
+<h4 class="anchored" data-anchor-id="r-libraries-to-be-used">R Libraries to be used</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pacman)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(<span class="st">"tidyverse"</span>, <span class="st">"openxlsx"</span>, <span class="st">"flextable"</span>, <span class="st">"janitor"</span>, <span class="st">"patchwork"</span>, <span class="st">"readxl"</span>, <span class="st">"infer"</span>, <span class="st">"camcorder"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="importing-data" class="level4">
+<h4 class="anchored" data-anchor-id="importing-data">Importing Data</h4>
+<p>Now, lets import the trip tables (from the import folder):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Indicates the local machine path</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>path_trip <span class="ot">&lt;-</span> <span class="st">"/Users/leandroalves/Library/CloudStorage/OneDrive-Personal/Documents/BINARIO/Pessoal/Leandro/1. stuff/Google Analytics/Course 08 - Capstone/bike/import"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Reads all pattern like files at the path</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>arquivos_trip <span class="ot">&lt;-</span> <span class="fu">dir</span>(path_trip, <span class="at">pattern =</span> <span class="st">"^Divvy_Trips.*csv$"</span>) </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Uses purrr function to read_csv all files within the directory and convert it to tibble</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>trip_raw <span class="ot">&lt;-</span> <span class="fu">map_df</span>(arquivos_trip, <span class="sc">~</span> <span class="fu">read_csv</span>(<span class="fu">str_c</span>(path_trip, <span class="st">"/"</span>, .x)) <span class="sc">%&gt;%</span> <span class="fu">mutate_all</span>(as.character) <span class="sc">%&gt;%</span> clean_names) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Glimpses the tibble.</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(trip_raw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 10,607,836
+Columns: 14
+$ trip_id           &lt;chr&gt; "6611093", "6611091", "6611090", "6611089", "6611088…
+$ starttime         &lt;chr&gt; "7/31/2015 23:59", "7/31/2015 23:59", "7/31/2015 23:…
+$ stoptime          &lt;chr&gt; "8/1/2015 0:03", "8/1/2015 0:22", "8/1/2015 0:18", "…
+$ bikeid            &lt;chr&gt; "4829", "3747", "1417", "3829", "3647", "199", "993"…
+$ tripduration      &lt;chr&gt; "197", "1378", "1178", "243", "2656", "1806", "747",…
+$ from_station_id   &lt;chr&gt; "239", "177", "403", "287", "305", "506", "301", "50…
+$ from_station_name &lt;chr&gt; "Western Ave &amp; Leland Ave", "Theater on the Lake", "…
+$ to_station_id     &lt;chr&gt; "242", "312", "150", "38", "506", "506", "24", "372"…
+$ to_station_name   &lt;chr&gt; "Damen Ave &amp; Leland Ave", "Clarendon Ave &amp; Gordon Te…
+$ usertype          &lt;chr&gt; "Subscriber", "Subscriber", "Customer", "Subscriber"…
+$ gender            &lt;chr&gt; "Male", "Male", NA, "Male", NA, "Female", "Male", "F…
+$ birthyear         &lt;chr&gt; "1978", "1980", NA, "1987", NA, "1985", "1985", "198…
+$ start_time        &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+$ end_time          &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</code></pre>
+</div>
+</div>
+<p>There is four variables candidates for date type: starttime, stoptime, start_time and end_time. First it is important to investigate the date formats available in the files to reduce inconsistency.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>trip_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">digst =</span> <span class="fu">str_length</span>(starttime)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(digst) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(digst) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(digst, starttime)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 2
+# Groups:   digst [8]
+  digst starttime          
+  &lt;int&gt; &lt;chr&gt;              
+1    13 7/9/2015 9:59      
+2    14 7/31/2015 9:59     
+3    15 7/31/2015 23:59    
+4    16 12/31/2015 23:48   
+5    17 9/9/2016 23:57:18  
+6    18 9/30/2016 23:59:58 
+7    19 12/31/2016 23:57:52
+8    NA &lt;NA&gt;               </code></pre>
+</div>
+</div>
+<p>Here it can be seen it has the data format as month, day and year, but the hourly format sometimes has seconds and others do not. In this case, each date column will be separated so it can rightly be converted later to adjust the feature data type. To begin with, it was separated the days from the hourly parts, processed each individually and finally got back together with the <code>make_datetime()</code> function from <code>lubridate</code> package.</p>
+<p>Also, it is important to notice it is not the whole database which contains 10.607.836 observations and this can demand extra processing time without necessity. So I decide to use the <code>dplyr</code> R package <code>slice_sample()</code> function to adequately crop the table in 10% of its total.</p>
+<p>As a further step, all the left over character variables will be converted to factor for analyses phase next.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>trip <span class="ot">&lt;-</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    trip_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_sample</span>(<span class="at">prop =</span> <span class="fl">0.1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">separate</span>(starttime, <span class="at">sep =</span> <span class="st">" "</span>, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"starttime_day"</span>, <span class="st">"starttime_t"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">separate</span>(stoptime, <span class="at">sep =</span> <span class="st">" "</span>, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"stoptime_day"</span>, <span class="st">"stoptime_t"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">separate</span>(start_time, <span class="at">sep =</span> <span class="st">" "</span>, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"start_time_day"</span>, <span class="st">"start_time_t"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">separate</span>(end_time, <span class="at">sep =</span> <span class="st">" "</span>, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"end_time_day"</span>, <span class="st">"end_time_t"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">day_started_at =</span> <span class="fu">if_else</span>(<span class="sc">!</span><span class="fu">is.na</span>(starttime_day), starttime_day, start_time_day),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">day_ended_at =</span> <span class="fu">if_else</span>(<span class="sc">!</span><span class="fu">is.na</span>(stoptime_day), stoptime_day, end_time_day),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">time_started_at =</span> <span class="fu">if_else</span>(<span class="sc">!</span><span class="fu">is.na</span>(starttime_t), starttime_t, start_time_t),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">time_ended_at =</span> <span class="fu">if_else</span>(<span class="sc">!</span><span class="fu">is.na</span>(stoptime_t), stoptime_t, end_time_t)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="fu">ends_with</span>(<span class="st">"_t"</span>), <span class="sc">-</span><span class="fu">ends_with</span>(<span class="st">"_day"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(tripduration, birthyear), as.numeric)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">starts_with</span>(<span class="st">"time"</span>), <span class="sc">~</span> <span class="fu">if_else</span>(<span class="fu">str_length</span>(.x) <span class="sc">&lt;=</span> <span class="dv">5</span>, <span class="fu">hm</span>(.x), <span class="fu">hms</span>(.x)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">starts_with</span>(<span class="st">"day"</span>), mdy)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.character), as.factor)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">started_at =</span> <span class="fu">make_datetime</span>(</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">year</span>(day_started_at),</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">month</span>(day_started_at),</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">day</span>(day_started_at),</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">hour</span>(time_started_at),</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">minute</span>(time_started_at),</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">second</span>(time_started_at)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">ended_at =</span> <span class="fu">make_datetime</span>(</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">year</span>(day_ended_at),</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">month</span>(day_ended_at),</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>      <span class="fu">day</span>(day_ended_at),</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">hour</span>(time_ended_at),</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">minute</span>(time_ended_at),</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>      <span class="fu">second</span>(time_ended_at)</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">"day"</span>), <span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">"time"</span>))</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,060,783 × 12
+   trip_id  bikeid tripduration from_station_id from_station_name  to_station_id
+   &lt;fct&gt;    &lt;fct&gt;         &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt;              &lt;fct&gt;        
+ 1 5396829  1648           1486 364             Larrabee St &amp; Oak… 284          
+ 2 15137491 5386           1513 194             Wabash Ave &amp; Wack… 35           
+ 3 13696883 958             430 75              Clinton St &amp; Jack… 71           
+ 4 12774486 5895            404 233             Sangamon St &amp; Was… 32           
+ 5 5051892  3093           1140 152             Lincoln Ave &amp; Div… 242          
+ 6 12037813 4849            258 299             Halsted St &amp; Rosc… 232          
+ 7 15351402 2150            859 256             Broadway &amp; Sherid… 13           
+ 8 15166132 3466           3219 623             Michigan Ave &amp; 8t… 76           
+ 9 12577008 5290           2166 313             Lakeview Ave &amp; Fu… 313          
+10 5848145  4821            904 177             Theater on the La… 177          
+# ℹ 1,060,773 more rows
+# ℹ 6 more variables: to_station_name &lt;fct&gt;, usertype &lt;fct&gt;, gender &lt;fct&gt;,
+#   birthyear &lt;dbl&gt;, started_at &lt;dttm&gt;, ended_at &lt;dttm&gt;</code></pre>
+</div>
+</div>
+<p>Now using the <code>skim()</code> function from <code>skimr</code> package to really understand the data and see what is missing.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(trip)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">trip</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">1060783</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">factor</td>
+<td style="text-align: left;">8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">POSIXct</td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: factor</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 44%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: left;">ordered</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: left;">top_counts</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">trip_id</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">1060781</td>
+<td style="text-align: left;">110: 2, 115: 2, 100: 1, 100: 1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bikeid</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">6356</td>
+<td style="text-align: left;">144: 330, 312: 323, 435: 298, 367: 296</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">from_station_id</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">583</td>
+<td style="text-align: left;">35: 25636, 76: 15172, 177: 13791, 268: 13527</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">from_station_name</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">637</td>
+<td style="text-align: left;">Str: 18937, Lak: 15172, The: 13791, Lak: 13527</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">to_station_id</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">585</td>
+<td style="text-align: left;">35: 28434, 268: 15005, 177: 14575, 76: 14420</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">to_station_name</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">640</td>
+<td style="text-align: left;">Str: 20569, Lak: 15005, The: 14575, Lak: 14420</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">usertype</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">Sub: 798251, Cus: 262510, Dep: 22</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">gender</td>
+<td style="text-align: right;">262487</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">Mal: 597255, Fem: 201041</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 11%">
+<col style="width: 16%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">tripduration</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">987.51</td>
+<td style="text-align: right;">1791.71</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">410</td>
+<td style="text-align: right;">704</td>
+<td style="text-align: right;">1177</td>
+<td style="text-align: right;">86253</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">birthyear</td>
+<td style="text-align: right;">262441</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">1980.68</td>
+<td style="text-align: right;">10.78</td>
+<td style="text-align: right;">1899</td>
+<td style="text-align: right;">1975</td>
+<td style="text-align: right;">1984</td>
+<td style="text-align: right;">1989</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">▁▁▂▇▁</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: POSIXct</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: left;">min</th>
+<th style="text-align: left;">max</th>
+<th style="text-align: left;">median</th>
+<th style="text-align: right;">n_unique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">started_at</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">2015-01-01 00:08:00</td>
+<td style="text-align: left;">2017-12-31 23:34:00</td>
+<td style="text-align: left;">2016-08-08 17:06:43</td>
+<td style="text-align: right;">824987</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ended_at</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">2015-01-01 00:13:00</td>
+<td style="text-align: left;">2017-12-31 23:39:00</td>
+<td style="text-align: left;">2016-08-08 17:19:21</td>
+<td style="text-align: right;">822896</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="transforming-the-data" class="level4">
+<h4 class="anchored" data-anchor-id="transforming-the-data">Transforming the Data</h4>
+<p>Checking for consistency in <code>tripduration</code> feature because it showed some ultrahigh values as 239.5916667 hours and it seemed like an error or an outlier. To do so, lets ad a new calculated feature <code>ride_length</code> and see if both are align.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>trip_with_ridelength <span class="ot">&lt;-</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>trip <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ride_length =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(ended_at, started_at, <span class="at">units =</span> <span class="st">"secs"</span>)),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">difference =</span> tripduration<span class="sc">-</span>ride_length) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tripduration, ride_length, difference, <span class="fu">everything</span>()) <span class="co"># organizing fields to investigate the difference</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The calculated diference <code>ride_length</code> showed some negative values to be investigated and also showed the highvalues were correct. Let’s dig in a little further in the negative values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>trip_with_ridelength <span class="sc">%&gt;%</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ride_length <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(trip_raw <span class="sc">%&gt;%</span> <span class="fu">select</span>(trip_id, starttime, stoptime, start_time, end_time), <span class="at">by =</span> <span class="st">"trip_id"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tripduration, ride_length, difference, started_at, ended_at, starttime, stoptime, start_time, end_time) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 9
+  tripduration ride_length difference started_at          ended_at           
+         &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt; &lt;dttm&gt;              &lt;dttm&gt;             
+1         1699       -1860       3559 2017-11-05 01:58:00 2017-11-05 01:27:00
+2          716       -2880       3596 2017-11-05 01:54:00 2017-11-05 01:06:00
+# ℹ 4 more variables: starttime &lt;chr&gt;, stoptime &lt;chr&gt;, start_time &lt;chr&gt;,
+#   end_time &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>By this last, it can be seen there are inconsistencies, but for very few registers. Maybe because the actual device clocks where not synchronized. In any case, for the final transformation these values will be filtered out.</p>
+<p>Creating column <code>day_of_week</code>, <code>yr</code> for year and <code>mth</code> for month in trip table. Also, it will be added a column with the age of the member subtracting the birthyear from <code>yr</code>.</p>
+<p>Another step is to convert the user type designations to “members” and “casual” as the maketing team named them. But, first, let’s see how many different usertypes and how many registers from each to be treated.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>trip <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(usertype)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  usertype        n
+  &lt;fct&gt;       &lt;int&gt;
+1 Customer   262510
+2 Dependent      22
+3 Subscriber 798251</code></pre>
+</div>
+</div>
+<p>From here, it showed three types, and the “Dependent” was not mentioned even in the description files. Let’s see if they have the members atributes as <code>birthyear</code> and <code>gender</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>trip <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(usertype <span class="sc">==</span> <span class="st">"Dependent"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(usertype, birthyear, gender, <span class="fu">everything</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(birthyear) <span class="sc">|</span> <span class="fu">is.na</span>(gender))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 12
+  usertype  birthyear gender trip_id bikeid tripduration from_station_id
+  &lt;fct&gt;         &lt;dbl&gt; &lt;fct&gt;  &lt;fct&gt;   &lt;fct&gt;         &lt;dbl&gt; &lt;fct&gt;          
+1 Dependent      1973 &lt;NA&gt;   6326116 4805           1797 327            
+# ℹ 5 more variables: from_station_name &lt;fct&gt;, to_station_id &lt;fct&gt;,
+#   to_station_name &lt;fct&gt;, started_at &lt;dttm&gt;, ended_at &lt;dttm&gt;</code></pre>
+</div>
+</div>
+<p>As it can be seen, only few or none registers have no gender, maybe some typos, but for consistency this record will be dropped (by filter). For the rest, the “Dependent” user is a “member”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  trip_transformed <span class="ot">&lt;-</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    trip_with_ridelength <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(ride_length <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> <span class="co"># removing inconsistent ride_length </span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>difference) <span class="sc">%&gt;%</span> <span class="co"># removing the difference auxiliar field</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">day_of_week =</span> <span class="fu">wday</span>(started_at, <span class="at">week_start =</span> <span class="dv">7</span>, <span class="at">label =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">yr =</span> <span class="fu">year</span>(started_at),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">mth =</span> <span class="fu">month</span>(started_at),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">age =</span> yr <span class="sc">-</span> birthyear,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">usertype =</span> <span class="fu">if_else</span>(usertype <span class="sc">==</span> <span class="st">"Customer"</span>, <span class="st">"casual"</span>, <span class="st">"member"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span>(usertype <span class="sc">==</span> <span class="st">"member"</span> <span class="sc">&amp;</span> (<span class="fu">is.na</span>(birthyear) <span class="sc">|</span> <span class="fu">is.na</span>(gender)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"at"</span>), day_of_week, <span class="fu">everything</span>())</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,060,648 × 17
+   started_at          ended_at            day_of_week tripduration ride_length
+   &lt;dttm&gt;              &lt;dttm&gt;                    &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;
+ 1 2015-05-29 17:47:00 2015-05-29 18:11:00           6         1486        1440
+ 2 2017-07-14 15:06:36 2017-07-14 15:31:49           6         1513        1513
+ 3 2017-04-18 07:47:00 2017-04-18 07:54:10           3          430         430
+ 4 2016-11-17 19:16:21 2016-11-17 19:23:05           5          404         404
+ 5 2015-05-04 14:09:00 2015-05-04 14:28:00           2         1140        1140
+ 6 2016-09-23 13:56:40 2016-09-23 14:00:58           6          258         258
+ 7 2017-07-24 19:30:56 2017-07-24 19:45:15           2          859         859
+ 8 2017-07-15 17:16:25 2017-07-15 18:10:04           7         3219        3219
+ 9 2016-11-01 17:09:43 2016-11-01 17:45:49           3         2166        2166
+10 2015-06-26 09:40:00 2015-06-26 09:56:00           6          904         960
+# ℹ 1,060,638 more rows
+# ℹ 12 more variables: trip_id &lt;fct&gt;, bikeid &lt;fct&gt;, from_station_id &lt;fct&gt;,
+#   from_station_name &lt;fct&gt;, to_station_id &lt;fct&gt;, to_station_name &lt;fct&gt;,
+#   usertype &lt;chr&gt;, gender &lt;fct&gt;, birthyear &lt;dbl&gt;, yr &lt;dbl&gt;, mth &lt;dbl&gt;,
+#   age &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="summary" class="level4">
+<h4 class="anchored" data-anchor-id="summary">Summary</h4>
+<p>All the transformation and cleaning process is documented above. Nonetheless it was used 10% sample to do the exercise regarding it would not matter for the final results.</p>
+</section>
+</section>
+</section>
+<section id="analyse" class="level2">
+<h2 class="anchored" data-anchor-id="analyse">ANALYSE</h2>
+<p>Let’s now perform an exploratory data analyses in order to answer the main question of the difference between members and casual users.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(trip_transformed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">trip_transformed</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">1060648</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">factor</td>
+<td style="text-align: left;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">POSIXct</td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 13%">
+<col style="width: 19%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">empty</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: right;">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">usertype</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: factor</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 44%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: left;">ordered</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: left;">top_counts</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">trip_id</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">1060646</td>
+<td style="text-align: left;">110: 2, 115: 2, 100: 1, 100: 1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bikeid</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">6356</td>
+<td style="text-align: left;">144: 330, 312: 322, 435: 297, 367: 296</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">from_station_id</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">583</td>
+<td style="text-align: left;">35: 25636, 76: 15172, 177: 13790, 268: 13524</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">from_station_name</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">637</td>
+<td style="text-align: left;">Str: 18937, Lak: 15172, The: 13790, Lak: 13524</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">to_station_id</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">585</td>
+<td style="text-align: left;">35: 28432, 268: 15002, 177: 14574, 76: 14420</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">to_station_name</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">640</td>
+<td style="text-align: left;">Str: 20568, Lak: 15002, The: 14574, Lak: 14420</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">gender</td>
+<td style="text-align: right;">262368</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">Mal: 597239, Fem: 201041</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 11%">
+<col style="width: 16%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">day_of_week</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">4.01</td>
+<td style="text-align: right;">1.98</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: left;">▇▅▃▃▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tripduration</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">987.48</td>
+<td style="text-align: right;">1791.50</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">410</td>
+<td style="text-align: right;">704</td>
+<td style="text-align: right;">1177</td>
+<td style="text-align: right;">86253</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ride_length</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">987.37</td>
+<td style="text-align: right;">1791.60</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">420</td>
+<td style="text-align: right;">718</td>
+<td style="text-align: right;">1184</td>
+<td style="text-align: right;">87420</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">birthyear</td>
+<td style="text-align: right;">262368</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">1980.68</td>
+<td style="text-align: right;">10.78</td>
+<td style="text-align: right;">1899</td>
+<td style="text-align: right;">1975</td>
+<td style="text-align: right;">1984</td>
+<td style="text-align: right;">1989</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">▁▁▂▇▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">yr</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">2016.06</td>
+<td style="text-align: right;">0.81</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">▆▁▇▁▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">mth</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">7.10</td>
+<td style="text-align: right;">2.58</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: left;">▃▅▇▇▅</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">262368</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">35.42</td>
+<td style="text-align: right;">10.75</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: left;">▁▇▂▁▁</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: POSIXct</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: left;">min</th>
+<th style="text-align: left;">max</th>
+<th style="text-align: left;">median</th>
+<th style="text-align: right;">n_unique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">started_at</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">2015-01-01 00:08:00</td>
+<td style="text-align: left;">2017-12-31 23:34:00</td>
+<td style="text-align: left;">2016-08-08 16:53:36</td>
+<td style="text-align: right;">824909</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ended_at</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">2015-01-01 00:13:00</td>
+<td style="text-align: left;">2017-12-31 23:39:00</td>
+<td style="text-align: left;">2016-08-08 17:11:14</td>
+<td style="text-align: right;">822812</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>First, from the <code>skim()</code> function above, it can be notice that birthday and gender are only 75.3% completed, and it is probably due to the information from the README.txt file:</p>
+<p><em>Gender and birthday are only available for Subscribers</em></p>
+<p>The number of lines indicated is wrong though, it is probably because the README.txt is generic and covers only for one subfolder from the analyses and I decided to look over a bigger period: 3 years. In the present case, it will be selected a 10% sampled data from the full 10 millions rows in the original imported trip data under the table name of <code>trip_raw</code> in this work.</p>
+<p>The <code>skim()</code> function provides all the descriptive analysis for all variables including a little histogram for numeric variable as well.</p>
+<p>Examples of information extracted: The mean of the <code>ride_length</code> is 987.3742882 .<br>
+The max of <code>ride_length</code> is 8.742^{4}.<br>
+The mode for the <code>day_of_week</code> is 4.</p>
+<p>One last point is the age and birthday field. They do not seem ok because there is some very aged people. Maybe is the case for a filter dropping this outliers (it was maybe typos). Let’s see a histogram for the first quartile (<span class="citation" data-cites="birth-first-quartile-hist">@birth-first-quartile-hist</span>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>trip_transformed <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(age)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(age, birthyear, <span class="fu">everything</span>()) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(birthyear<span class="sc">&lt;</span><span class="dv">1975</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(birthyear)) <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-birth-first-quartile-hist" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-birth-first-quartile-hist-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Histogram for birthdays of the first quartile (birthday &lt; 1975)</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Well in this case, it can be seen some birth year registers around 1900 and 1920, but they are only a few: 346 in 1.060.648 registers. In this case, to better perform the analysis, this cases will be filtered.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="ot">&lt;-</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>trip_transformed <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(usertype <span class="sc">==</span> <span class="st">"member"</span> <span class="sc">&amp;</span> birthyear <span class="sc">&lt;</span> <span class="dv">1930</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>It can be performed a lot of tests and as it is already known the proportion between casual and member users, let’s jump testing user type and gender to see the proportion using a bar chart:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(usertype <span class="sc">==</span> <span class="st">"member"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(gender, <span class="at">fill =</span> gender)) <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>(<span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-gender-usertype-bar" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-gender-usertype-bar-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;2: Gender distribution for Members</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>In this <a href="#fig-gender-usertype-bar">Figure&nbsp;2</a> it was filtered only members because casual users do not have information on sex. By the other hand, although for the Subscriber (member category) it has more male than female, it do not give a good clue on differentiation.</p>
+<p>Also, how it had been told about using the devices over a period of time, it is cool to see it over time and look for seasonality. As it was created a column with the week day, it yields a graph plotting of user type versus week day and versus year using a <code>facet_grid</code> to see its behaving.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(day_of_week, <span class="at">fill =</span> usertype)) <span class="sc">+</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>( yr <span class="sc">~</span> usertype) <span class="sc">+</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-usertype-dow-year-facet-grid" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-usertype-dow-year-facet-grid-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;3: User type vs day_of_week by year</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Analyzing the bar formation shape at <a href="#fig-usertype-dow-year-facet-grid">Figure&nbsp;3</a>, it can be seen a big difference between the categories week day based and little difference in the pattern along the years. In this image one can notice the members use the bikes in busy days more often. In casual users the pattern is inverted.</p>
+<p>In this case it can be stated that the members use in week busy days is consistently higher than on the weekends.</p>
+<p>Also, it does not have a gender classification in casual users, maybe it could use the members as a proxy and understand if is there a difference between them regarding week days (now it is not testing years anymore, since it showed no interference in <a href="#fig-usertype-dow-year-facet-grid">Figure&nbsp;3</a>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(usertype <span class="sc">==</span> <span class="st">"member"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(day_of_week, <span class="at">fill =</span> gender)) <span class="sc">+</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>( <span class="sc">~</span> gender) <span class="sc">+</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-member-dow-gender-facet-wrap" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-member-dow-gender-facet-wrap-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;4: Gender vs day_of_week for Members</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>By the <a href="#fig-member-dow-gender-facet-wrap">Figure&nbsp;4</a> plot it can be seen although the graphs shape are similar for women using more bikes during the busy days it is almost flat in comparison with men’s use.</p>
+<p>Maybe with a boxplot, the evidence could be highlighted.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(usertype <span class="sc">==</span> <span class="st">"member"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(gender, day_of_week, <span class="at">fill =</span> gender)) <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_jitter(size = 2, alpha = .6) +</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>, <span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-member-dow-gender-box" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-member-dow-gender-box-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;5: Gender vs day_of_week for Members</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The female gender is a little weekly spreader than the male one.</p>
+<p>Some study on age to see its relationship with gender.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(usertype <span class="sc">==</span> <span class="st">"member"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(gender, age, <span class="at">fill =</span> gender)) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_jitter(size = 2, alpha = .6) +</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>, <span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-member-age-gender-box" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-member-age-gender-box-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;6: Age vs gender for Members</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>And also for week days by age.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(usertype <span class="sc">==</span> <span class="st">"member"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">day_of_week =</span> <span class="fu">as.factor</span>(day_of_week)) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ggstatsplot::ggbetweenstats(day_of_week, age)</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(day_of_week, age)) <span class="sc">+</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_jitter(size = 2, alpha = .6) +</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>, <span class="at">alpha =</span> .<span class="dv">3</span>, <span class="at">fill =</span> <span class="st">"navy"</span>, <span class="at">color =</span> <span class="st">"navy"</span>) <span class="sc">+</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-member-age-dow-box" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-member-age-dow-box-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;7: Age vs day_of_week for Members</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Another analyse should be about the month seasonality differences.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(day_of_week, usertype, mth) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(day_of_week, mth), as.factor)) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(day_of_week, mth, <span class="at">fill =</span> n)) <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>( <span class="sc">~</span> usertype) <span class="sc">+</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-usertype-dow-month-tile" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-usertype-dow-month-tile-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;8: User type vs day_of_week by month</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>For the variable <code>ride_length</code>, it can be notice in the descriptive summary (skim) it is distorted because you have some trips during all day long (~ 23h). This could be a reading error from the devices for instance. Let’s see its histograms to look for any distinction in the last quartile (]75,100]) and for the sake of better visualization it will be in logarithm scale and also in minutes (x60) as integer.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ride_length <span class="sc">&gt;</span> <span class="dv">1182</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ride_length =</span> <span class="fu">as.integer</span>(ride_length<span class="sc">/</span><span class="dv">60</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(ride_length, <span class="at">fill =</span> usertype)) <span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"ghostwhite"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">""</span>,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"ride_length(min)"</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>( <span class="sc">~</span> usertype, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output-display">
+<p>[Histogram ride_length by User Type - Fourth Quartile (]75,100])](bikeR_files/figure-html/fig-usertype-ride-hist-facet-q4-1.png){#fig-usertype-ride-hist-facet-q4 width=672}</p>
+</div>
+</div>
+<p>Now let’s plot the same for the other quartiles.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ride_length <span class="sc">&lt;=</span> <span class="dv">1182</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ride_length =</span> <span class="fu">as.integer</span>(ride_length<span class="sc">/</span><span class="dv">60</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(ride_length, <span class="at">fill =</span> usertype)) <span class="sc">+</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"ghostwhite"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">""</span>,</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"ride_length(min)"</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale_x_log10() +</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>( <span class="sc">~</span> usertype, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-usertype-ride-hist-facet-q13" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-usertype-ride-hist-facet-q13-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;9: Histogram ride_length by User Type - Three first quartiles ([0,75])</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>After analysing both graphs, it is clear the different pattern between the user types. The casual ones do longer trips than the other group.</p>
+<p>Let’s see this performance differentiation between business days (days 2, 3, 4, 5 and 6) and weekend days (days 1 and 7) only for the first three quartiles (&lt;75%).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ride_length <span class="sc">&lt;=</span> <span class="dv">1182</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ride_length =</span> <span class="fu">as.integer</span>(ride_length<span class="sc">/</span><span class="dv">60</span>),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_type =</span> <span class="fu">as.factor</span>(<span class="fu">if_else</span>(<span class="fu">between</span>(day_of_week, <span class="dv">2</span>, <span class="dv">6</span>), <span class="st">"Business Day"</span>, <span class="st">"Weekend Day"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(ride_length, <span class="at">fill =</span> usertype)) <span class="sc">+</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"ghostwhite"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">""</span>,</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"ride_length(min)"</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale_x_log10() +</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>( day_type <span class="sc">~</span> usertype, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-usertype-daytype-ride-facet-q13" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-usertype-daytype-ride-facet-q13-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;10: Histogram ride_length by User Type and Type of Day - Three first quartiles ([0,75])</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Well, from the <a href="#fig-usertype-daytype-ride-facet-q13">Figure&nbsp;10</a> it showed there is no substantial pattern difference between both groups: Business Day and Weekend Day for each user type.</p>
+<p>Let’s make one more to check if there is any correlation between the user age and the ride length. It used the <code>viridis</code> color package to show bigger contrast.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># filter(ride_length &lt;= 1182) %&gt;% </span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(usertype <span class="sc">==</span> <span class="st">"member"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ride_length =</span> <span class="fu">as.integer</span>(ride_length<span class="sc">/</span><span class="dv">60</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(ride_length, age, <span class="at">color =</span> gender)) <span class="sc">+</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> .<span class="dv">1</span>, <span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Age (yr)"</span>,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"ride_length(min)"</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_d</span>(<span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Transformation introduced infinite values in continuous x-axis
+Transformation introduced infinite values in continuous x-axis</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 5 rows containing non-finite values (`stat_smooth()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-usertype-ride-scat-all" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="bikeR_files/figure-html/fig-usertype-ride-scat-all-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;11: Scatter ride_length vs Age</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>For the <a href="#fig-usertype-ride-scat-all">Figure&nbsp;11</a> it can be extracted the fact there is no significant correlation between age and ride length and also that it is the same for both gender.</p>
+<section id="summary-1" class="level4">
+<h4 class="anchored" data-anchor-id="summary-1">Summary</h4>
+<p>In this, one can get a lot of information from <a href="#fig-usertype-dow-month-tile">Figure&nbsp;8</a> as the casual user basically uses the platform from april to october and on weekends, but the members use it all over the year with intensification in those months but mainly on business days and for the ride length it was captured from <a href="#fig-usertype-ride-hist-facet-q13">Figure&nbsp;9</a> that members use to make shorter trips (less then 10 min) than the casual ones (over 10 min).</p>
+<p>Also, from the descriptive analysis, it can be extracted the members characteristics:</p>
+<p>The typical user is:</p>
+<p>Male (74.8%).</p>
+<p>Average Age: 35.4.</p>
+<p>Ride length:</p>
+<ul>
+<li><p>Member Users:</p>
+<ul>
+<li><p>Typically under <code>r round(quantile(trip_for_analysis$ride_length[``trip_for_analysis$usertype == "member"``])[4]/60, 0)</code> minutes (75%).</p></li>
+<li><p>Average: <code>r round(mean(trip_for_analysis$ride_length``[trip_for_analysis$usertype == "member"]``)/60, 1)</code> minutes</p></li>
+<li><p>Mode: <code>r round(``quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])[3]/60, 0)</code> minutes</p></li>
+</ul></li>
+<li><p>Casual Users:</p>
+<ul>
+<li><p>Typically under <code>r round(quantile(trip_for_analysis$ride_length[``trip_for_analysis$usertype == "casual"``])[4]/60, 0)</code> minutes (75%).</p></li>
+<li><p>Average: <code>r round(mean(trip_for_analysis$ride_length``[trip_for_analysis$usertype == "casual"]``)/60, 1)</code> minutes</p></li>
+<li><p>Mode: <code>r round(``quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "casual"])[3]/60, 0)</code> minutes</p></li>
+</ul></li>
+</ul>
+<p>Conclusion: casual users do longer trips and mostly on weekends. By the other hand member users do shorter trips mainly on business days. <em>Maybe it is an idea to identify which users within the casual have the same members pattern and make a direct campaign as bellow. At <a href="#tbl-casual-similar-member">Table&nbsp;1</a>, it is shown a simple model using the members group, but it can be logistic modeled do determine the best ROC curve to use as a next step</em>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ride_length <span class="sc">&lt;=</span> <span class="fu">quantile</span>(trip_for_analysis<span class="sc">$</span>ride_length[trip_for_analysis<span class="sc">$</span>usertype <span class="sc">==</span> <span class="st">"member"</span>])[<span class="dv">3</span>]) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(usertype <span class="sc">==</span> <span class="st">"casual"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ride_length =</span> <span class="fu">as.integer</span>(ride_length<span class="sc">/</span><span class="dv">60</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(usertype) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autofit</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="tbl-casual-similar-member" class="anchored">
+
+<div class="tabwid"><style>.cl-1adaf470{}.cl-1aca0a70{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-1ad68f0c{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-1ad68fc0{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-1ad6a50a{width:0.871in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1ad6a5be{width:0.752in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1ad6a60e{width:0.871in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1ad6a65e{width:0.752in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-1adaf470"><caption>Table&nbsp;1:  <p>Number of casual users within the ride length pattern above the
+members median.</p> </caption><thead><tr style="overflow-wrap:break-word;"><th class="cl-1ad6a50a"><p class="cl-1ad68f0c"><span class="cl-1aca0a70">usertype</span></p></th><th class="cl-1ad6a5be"><p class="cl-1ad68fc0"><span class="cl-1aca0a70">n</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-1ad6a60e"><p class="cl-1ad68f0c"><span class="cl-1aca0a70">casual</span></p></td><td class="cl-1ad6a65e"><p class="cl-1ad68fc0"><span class="cl-1aca0a70">26,713</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</div>
+<p>The file for further analysis is exported bellow in csv format and it is a very large file to be open in spreadsheets.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>trip_for_analysis <span class="sc">%&gt;%</span> <span class="fu">write.csv</span>(<span class="at">file =</span> <span class="st">"trip_for_analysis.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
