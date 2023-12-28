@@ -1,0 +1,229 @@
+---
+title: "bikeR"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r Bibliotecas, echo=FALSE}
+library(pacman)
+
+pacman::p_load("tidyverse", "openxlsx", "flextable", "janitor", "patchwork", "readxl", "infer", "camcorder")
+
+
+```
+
+## ASK
+
+**Guiding questions:**
+
+*What is the problem you are trying to solve?*
+
+**A:** To find out the key difference between annual members from casual users.
+
+*How can your insights drive business decisions?*
+
+**A:** It will help to find the key differentiations in order to get insights on how to mutate the casuals into annuals. Maybe it will be a simple matter. 
+
+**Key tasks**
+
+*1. Identify the business task*
+
+**A:** To figure out insights on how to convey casual users into annual members.
+
+*2. Consider key stakeholders*
+
+**A:** Moreno and Cyclistc Executive Team.
+
+**Deliverable**
+
+-   A clear statement of the business task
+
+## PREPARE
+
+**Guiding questions**
+
+*Where is your data located?* **A:** https://divvy-tripdata.s3.amazonaws.com/index.html The data has been made available by Motivate International Inc.
+
+*How is the data organized?* **A:** Within the above link, there are a lot of zip files. I notice some data was as a ride table monthly divided with names like: "YYYYMM-divvy-tripdata.zip" in which the table have an id from each ride, but few or none information on the users except their type. Continuing there are this another kind of name: "Divvy_Stations_Trips_YYYY_QXQZ.zip", for the semester (two quarters), other with only quarters from 2018 to 2020 and finnaly the "Divvy_Stations_Trips_2013.zip" containing two tables: trips in 2013 and stations. Within this last file, there is a RESUME.txt file containing the following tables descriptions:
+
+The tables:
+
+\*\*Metadata for Trips Table:
+
+Variables:
+
+-   trip_id: ID attached to each trip taken
+-   starttime: day and time trip started, in CST
+-   stoptime: day and time trip ended, in CST
+-   bikeid: ID attached to each bike
+-   tripduration: time of trip in seconds
+-   from_station_name: name of station where trip originated
+-   to_station_name: name of station where trip terminated
+-   from_station_id: ID of station where trip originated
+-   to_station_id: ID of station where trip terminated usertype: "Customer" is a rider who purchased a 24-Hour Pass; "Subscriber" is a rider who purchased an Annual Membership
+-   gender: gender of rider
+-   birthyear: birth year of rider
+
+Notes:
+
+-   First row contains column names
+-   Total records = 905,699
+-   Trips that did not include a start or end date were removed from original table.
+-   Gender and birthday are only available for Subscribers
+
+Metadata for Stations table:
+
+Variables:
+
+-   name: station name\
+-   latitude: station latitude
+-   longitude: station longitude
+-   dpcapacity: number of total docks at each station as of 8/20/2014 online
+-   date: date the station went live in the system
+
+I decided to import the most recent station table in the file "Divvy_Stations_2017_Q3Q4.csv" and the trips from 2015 to 2017 to keep in pace with the stations data.
+
+To do so, I create a folder named "import" to gather all the files to be imported.
+
+Nonetheless, it has rides registers also, and I decided import them as well.
+
+Are there issues with bias or credibility in this data? Does your data ROCCC?
+
+To see the data lets use the read_csv() function using ride tables at first and saving it to a tibble format:
+
+```{r ride, message=FALSE}
+#Indicates the local machine path
+path_ride <- "/Users/leandroalves/Library/CloudStorage/OneDrive-Personal/Documents/BINARIO/Pessoal/Leandro/1. stuff/Google Analytics/Course 08 - Capstone/bike"
+#Reads all pattern like files at the path
+arquivos_ride <- dir(path_trip, pattern = "tripdata\\.csv$") 
+#Uses purrr function to read_csv all files within the directory and convert it to tibble
+ride_raw <- map_df(arquivos_trip, ~ read_csv(str_c(path_trip, "/", .x)) %>% mutate_all(as.character) %>% clean_names) %>% as_tibble()
+
+#Glimpses the tibble.
+glimpse(ride_raw)
+```
+
+Now it is time to change the feature data types.
+
+```{r}
+(ride <- 
+  ride_raw %>% 
+  mutate(across(started_at:ended_at, ymd_hms)) %>% 
+  mutate(across(start_lat:end_lng, as.numeric)))
+```
+
+Now using the skim() function from skimr package to really understand the data and see what is missing.
+
+```{r}
+skimr::skim(ride)
+```
+
+This rides table do not have the user's demographics and so they are not relevant, not attending ROCCC "R" criteria.
+
+Now, lets import the trip tables (from the import folder):
+
+```{r trip, message=FALSE}
+#Indicates the local machine path
+path_trip <- "/Users/leandroalves/Library/CloudStorage/OneDrive-Personal/Documents/BINARIO/Pessoal/Leandro/1. stuff/Google Analytics/Course 08 - Capstone/bike/import"
+#Reads all pattern like files at the path
+arquivos_trip <- dir(path_trip, pattern = "^Divvy_Trips.*csv$") 
+#Uses purrr function to read_csv all files within the directory and convert it to tibble
+trip_raw <- map_df(arquivos_trip, ~ read_csv(str_c(path_trip, "/", .x)) %>% mutate_all(as.character) %>% clean_names) %>% as_tibble()
+
+#Glimpses the tibble.
+glimpse(trip_raw)
+```
+
+There is four variables candidates for date type: starttime, stoptime, start_time and end_time. First we have to investigate the formats available in the files to reduce inconsistency.
+
+```{r}
+trip_raw %>% 
+  mutate(digst = str_length(starttime)) %>% 
+  group_by(digst) %>% 
+  arrange(digst) %>% 
+  slice(1) %>% 
+  select(digst, starttime)
+```
+
+Here we can see it has the data format as month, day and year, but the hourly format sometimes has seconds and others do not. In this case we will separate each date column so we can rightly convert it later to adjust the feature data type.
+
+```{r cleanning.trip, message=TRUE, warning=TRUE}
+(
+  trip <- 
+    trip_raw %>% 
+    separate(starttime, sep = " ", into = c("starttime_day", "starttime_t")) %>% 
+    separate(stoptime, sep = " ", into = c("stoptime_day", "stoptime_t")) %>% 
+    separate(start_time, sep = " ", into = c("start_time_day", "start_time_t")) %>% 
+    separate(end_time, sep = " ", into = c("end_time_day", "end_time_t")) %>% 
+    mutate(across(tripduration, as.numeric)) %>% 
+    mutate(across(ends_with("_t"), ~ if_else(str_length(.x) <= 5, hm(.x), hms(.x)))) %>% 
+    mutate(across(ends_with("_day"), mdy)) %>% 
+    mutate(across(where(is.character), as.factor))
+)
+```
+
+Now using the skim() function from skimr package to really understand the data and see what is missing.
+
+```{r}
+skimr::skim(trip)
+```
+
+For this table we have more information on the user: usertype, gender and birthyear. We also have complete information on a lot of trips and now we have a table fitting the ROCCC (not so current thought, but it is the best we have). 
+
+Now, lets import the station table (from the import folder):
+
+```{r station, message=FALSE}
+#Indicates the local machine path
+path_station <- "/Users/leandroalves/Library/CloudStorage/OneDrive-Personal/Documents/BINARIO/Pessoal/Leandro/1. stuff/Google Analytics/Course 08 - Capstone/bike/import"
+#Reads all pattern like files at the path
+arquivos_station <- dir(path_station, pattern = ".*Station.*") 
+#Uses purrr function to read_csv all files within the directory and convert it to tibble
+station_raw <- map_df(arquivos_station, ~ read_csv(str_c(path_station, "/", .x)) %>% mutate_all(as.character) %>% clean_names) %>% as_tibble()
+
+#Glimpses the tibble.
+glimpse(station_raw)
+```
+
+Let's check the online_date field to understand the date formats available.
+
+```{r}
+station_raw %>% 
+  mutate(digst = str_length(online_date)) %>% 
+  group_by(digst) %>% 
+  arrange(digst) %>% 
+  slice(1) %>% 
+  select(digst, online_date)
+```
+
+In this case it is the same format for all: month, day, year and the hour and minute.
+Let's arrange the data types for the features.
+
+```{r cleanning.station, message=TRUE, warning=TRUE}
+(
+  station <- 
+    station_raw %>% 
+    select(-x8) %>% 
+    mutate(across(latitude:dpcapacity, as.numeric)) %>% 
+    mutate(across(online_date, mdy_hm)) %>% 
+    mutate(across(where(is.character), as.factor)) 
+)
+```
+
+Now using the skim() function from skimr package to really understand the data and see what is missing.
+
+```{r}
+skimr::skim(station)
+```
+
+These station data is very original, reliable, comprehensive, current (2017) and public 
+
+In these case, both, station and trip tables would be relevant do adress our outcome.
+
+How are you addressing licensing, privacy, security, and accessibility?  
+A: No problem since, the data has only birthday information on the subjects.  
+How did you verify the data's integrity?  
+A: Trying to import the date using r function read_csv().  
+It seems it has consistency across all formats. 
+How does it help you answer your question?  
+A: Specially the trip table, has no consistency across the date variables and it 
+Are there any problems with the data?

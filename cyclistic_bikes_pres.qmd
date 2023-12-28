@@ -1,0 +1,161 @@
+---
+title: "CYCLISTIC BIKES"
+author: "LEANDRO ALVES"
+date: "2023-12-27"
+format: 
+  revealjs:
+    smaller: true
+    scrollable: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r reading_file, message=FALSE, echo=FALSE, warning=FALSE}
+trip_for_analysis <- read.csv("trip_for_analysis.csv")
+
+```
+
+```{r Bibliotecas, message=FALSE, warning=FALSE, echo=FALSE}
+library(pacman)
+
+pacman::p_load("tidyverse", "openxlsx", "flextable", "janitor", "patchwork", "readxl", "infer", "camcorder")
+
+
+```
+
+## AGENDA
+
+-   QUESTION DO BE ANSWERED / SOURCE
+-   FINDINGS
+-   CONCLUSION
+
+## QUESTION TO BE ANSWERED
+
+**"HOW DO MEMBER RIDERS DIFFERENTIATE FROM CASUAL USERS?"**
+
+### SOURCE
+
+https://divvy-tripdata.s3.amazonaws.com/index.html\
+The data has been made available by Motivate International Inc.
+
+## FINDINGS I
+
+```{r usertype-dow-month-tile}
+
+fg_tile_var_trip <- # for tile graph var from trip_for_analysis
+trip_for_analysis %>% 
+  mutate(day_of_week = wday(started_at, label = TRUE),
+         mth_lb = month(started_at, label = TRUE)) %>%     
+  count(day_of_week, usertype, mth_lb) 
+
+fg_tile_var_trip %>% 
+ggplot(aes(day_of_week, mth_lb, fill = n)) +
+  geom_tile() +
+  # geom_rect(
+  #   data = fg_tile_var_trip %>% filter(usertype == "member"),
+  #   aes(xmin = 1, xmax = 7, ymin = 3, ymax = 12),
+  #   color = "black",
+  #   fill = NA
+  #   ) +
+  # geom_segment(
+  #       data = fg_tile_var_trip %>% filter(usertype == "member"),
+  #   aes(x = 7, xend = 9, y = 6, yend = 4),
+  #   color = "black",
+  #   fill = NA
+  # ) + 
+  labs(
+    title = "Difference between Members and Casual users",
+    subtitle = "Regarding total of dayly use (sum of trips by day)",
+    x = "",
+    y = "",
+    fill = "Trips"
+  ) +
+  facet_wrap( ~ usertype) +
+  coord_equal() +
+  scale_fill_viridis_c(labels = scales::label_comma(scale = 1e-3, suffix = "k")) +
+  theme_minimal() +
+  theme(
+    # panel.background = element_rect(fill = 'transparent'),
+    plot.background = element_rect(fill = 'transparent', color = NA),
+    # panel.border = element_rect(fill = NA, color = NA),
+    panel.grid = element_blank()
+  )
+```
+
+## FINDINGS II
+
+```{r usertype-day_of_week-hour-hist}
+
+trip_for_analysis %>% 
+  mutate(dh = hour(started_at)) %>% 
+  mutate(day_of_week = wday(started_at, label = TRUE),
+         mth_lb = month(started_at, label = TRUE)) %>%     
+  # filter(usertype == "member") %>% 
+  ggplot(aes(dh)) +
+  geom_bar(color = "grey30", fill = "white") +
+  labs(
+    title = "Difference between Members and Casual users",
+    subtitle = "Regarding total of hourly use (sum of trips by hour)",
+    x = "Hours of the Day",
+    y = "Number of Trips",
+    # fill = "Trips"
+  ) +
+  facet_grid(usertype ~ day_of_week) +
+  scale_y_continuous(label = scales::label_comma(scale = 1e-3, suffix = "k")) +
+  theme_dark() +
+  theme(
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = "grey30")
+  )
+```
+
+## FINDINGS III
+
+```{r usertype-ride-hist-facet-q13}
+
+trip_for_analysis %>% 
+  filter(ride_length <= quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])[4]) %>% 
+  mutate(ride_length = as.integer(ride_length/60)) %>% 
+ggplot(aes(ride_length, fill = usertype)) +
+  geom_histogram(color = "ghostwhite", show.legend = FALSE, bins = 16) +
+  labs(
+    title = "Difference between Members and Casual users",
+    subtitle = "Regarding to ride length for first 75% of total users",
+    y = "Number of Trips",
+    x = "ride_length(min)"
+  ) +
+  # scale_x_log10() +
+  facet_wrap( ~ usertype, scales = "free_y") +
+  scale_y_continuous(label = scales::label_comma(scale = 1e-3, suffix = "k")) +
+  scale_fill_manual(values = c("skyblue4", "grey70")) +
+  theme_minimal()
+```
+
+## CONCLUSION {.smaller}
+
+Casual users do longer trips and mostly on weekends. By the other hand, member users do shorter trips mainly on business days and mainly for work.
+
+The **typical user** is Male (`r round(mean(trip_for_analysis$gender[trip_for_analysis$usertype == "member"] == "Male", na.rm = TRUE)*100, 1)`%) and his Average Age is `r round(mean(trip_for_analysis$age[trip_for_analysis$usertype == "member"]), 1)` years.
+
+-   Regarding the **ride length** it was found the following differences:\
+    Member Users:
+
+    -   Typically under `r round(quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])[4]/60, 1)` minutes (75%).
+
+    -   Average: `r round(mean(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])/60, 1)` minutes.
+
+    -   Median: `r round(quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])[3]/60, 1)` minutes.
+
+-   Casual Users:
+
+    -   Typically under `r round(quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "casual"])[4]/60, 1)` minutes (75%).
+
+    -   \- Average: `r round(mean(trip_for_analysis$ride_length[trip_for_analysis$usertype == "casual"])/60, 1)` minutes.
+
+    -   \- Median: `r round(quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "casual"])[3]/60, 1)` minutes.
+
+## SUGESTION FOR FURTHER ACTION
+
+-   to identify casual users that fits the profile and communicate them some ofert.\
+-   to identify the typical stations the members starts from more often and do some marketing appeal within.\
+-   to make some generic campaings on using bikes for work as a good idea complying with ESG innitiatives.

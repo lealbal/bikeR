@@ -1,8 +1,15 @@
 ---
-title: "bikeR"
+title: "Bike Project Documentation"
+author: "Leandro Alves"
+date: "2023-12-27"
 editor_options: 
   chunk_output_type: console
+format: html
 ---
+
+```{r Variaveis, echo=FALSE, message=FALSE, warning=FALSE}
+prop <- .01
+```
 
 ## ASK
 
@@ -155,9 +162,11 @@ trip_raw <- map_df(arquivos_trip, ~ read_csv(str_c(path_trip, "/", .x)) %>% muta
 glimpse(trip_raw)
 ```
 
-There is four variables candidates for date type: starttime, stoptime, start_time and end_time. First it is important to investigate the date formats available in the files to reduce inconsistency.
+#### Cleanning Data
 
-```{r trip_raw}
+There are four candidate variables for date type: starttime, stoptime, start_time and end_time. First it is important to investigate the date formats available in the files in order to reduce inconsistency.
+
+```{r trip_raw_date_formats}
 trip_raw %>% 
   mutate(digst = str_length(starttime)) %>% 
   group_by(digst) %>% 
@@ -166,17 +175,17 @@ trip_raw %>%
   select(digst, starttime)
 ```
 
-Here it can be seen it has the data format as month, day and year, but the hourly format sometimes has seconds and others do not. In this case, each date column will be separated so it can rightly be converted later to adjust the feature data type. To begin with, it was separated the days from the hourly parts, processed each individually and finally got back together with the `make_datetime()` function from `lubridate` package.
+Here, it can be seen it has the data format as month, day and year, but the hourly format sometimes has seconds and others do not. In this case, each date column will be separated so it can rightly be converted later to adjust the feature data type. To begin with, it was separated the days from the hourly parts, processed each individually and finally got back together with the `make_datetime()` function from `lubridate` package.
 
-Also, it is important to notice it is not the whole database which contains `r formatC(nrow(trip_raw), digits = 0, format = 'f', big.mark = '.', decimal.mark = ',')` observations and this can demand extra processing time without necessity. So I decide to use the `dplyr` R package `slice_sample()` function to adequately crop the table in 10% of its total.
+Also, it is important to notice the whole database contains `r formatC(nrow(trip_raw), digits = 0, format = 'f', big.mark = '.', decimal.mark = ',')` observations and this can demand extra processing time without necessity. So I decide to use the `dplyr` R package `slice_sample()` function to adequately crop the table in `r round(prop*100, 0)`% of its total.
 
-As a further step, all the left over character variables will be converted to factor for analyses phase next.
+As a further step, all the left over character variables will be casted to factor for analyses phase.
 
 ```{r trip, message=FALSE, warning=FALSE}
 (
 trip <-
     trip_raw %>% 
-    slice_sample(prop = 0.1) %>% 
+    slice_sample(prop = prop) %>% 
     separate(starttime, sep = " ", into = c("starttime_day", "starttime_t")) %>% 
     separate(stoptime, sep = " ", into = c("stoptime_day", "stoptime_t")) %>% 
     separate(start_time, sep = " ", into = c("start_time_day", "start_time_t")) %>% 
@@ -280,13 +289,13 @@ As it can be seen, only few or none registers have no gender, maybe some typos, 
 
 #### Summary
 
-All the transformation and cleaning process is documented above. Nonetheless it was used 10% sample to do the exercise regarding it would not matter for the final results.
+All the transformation and cleaning process is documented above. Nonetheless it was used `r round(prop*100, 0)`% sample to do the exercise regarding it would not matter for the final results.
 
 ## ANALYSE
 
 Let's now perform an exploratory data analyses in order to answer the main question of the difference between members and casual users.
 
-```{r}
+```{r skim-trip_transformed}
 skimr::skim(trip_transformed)
 ```
 
@@ -304,7 +313,7 @@ The mode for the `day_of_week` is `r median(trip_transformed$day_of_week)`.
 
 One last point is the age and birthday field. They do not seem ok because there is some very aged people. Maybe is the case for a filter dropping this outliers (it was maybe typos). Let's see a histogram for the first quartile (@birth-first-quartile-hist).
 
-```{r}
+```{r birth-first-quartile-hist}
 #| label: fig-birth-first-quartile-hist
 #| fig-cap: "Histogram for birthdays of the first quartile (birthday < 1975)"
 
@@ -317,7 +326,7 @@ trip_transformed %>%
 
 Well in this case, it can be seen some birth year registers around 1900 and 1920, but they are only a few: `r trip_transformed %>% filter(birthyear < 1930) %>% count()` in `r formatC(nrow(trip_transformed), digits = 0, format = 'f', big.mark = '.', decimal.mark = ',')` registers. In this case, to better perform the analysis, this cases will be filtered.
 
-```{r}
+```{r birthyear_less_1930}
 trip_for_analysis <- 
 trip_transformed %>% 
   filter(!(usertype == "member" & birthyear < 1930))
@@ -355,11 +364,24 @@ ggplot(aes(day_of_week, fill = usertype)) +
 
 Analyzing the bar formation shape at @fig-usertype-dow-year-facet-grid, it can be seen a big difference between the categories week day based and little difference in the pattern along the years. In this image one can notice the members use the bikes in busy days more often. In casual users the pattern is inverted.
 
-In this case it can be stated that the members use in week busy days is consistently higher than on the weekends.
+In this case it can be stated that the members use in week busy days is consistently higher than on the weekends. This suggests the hypothesis of use for work. The hourly behavior in the @fig-usertype-day_of_week-hour-hist shows the conclusion by the peaks (rush hours) in business days for member users, it is really mainly used for work.
+
+```{r usertype-day_of_week-hour-hist}
+#| label: fig-usertype-day_of_week-hour-hist
+#| fig-cap: "User type vs day_of_week by hour"
+
+trip_for_analysis %>% 
+  mutate(dh = hour(started_at)) %>% 
+  # filter(usertype == "member") %>% 
+  ggplot(aes(dh)) +
+  geom_bar(color = "white") +
+  facet_grid(usertype ~ day_of_week) +
+  theme_minimal()
+```
 
 Also, it does not have a gender classification in casual users, maybe it could use the members as a proxy and understand if is there a difference between them regarding week days (now it is not testing years anymore, since it showed no interference in @fig-usertype-dow-year-facet-grid).
 
-```{r}
+```{r member-dow-gender-facet-wrap}
 #| label: fig-member-dow-gender-facet-wrap
 #| fig-cap: "Gender vs day_of_week for Members"
 
@@ -369,6 +391,7 @@ trip_for_analysis %>%
 ggplot(aes(day_of_week, fill = gender)) +
   geom_bar(show.legend = FALSE) +
   facet_wrap( ~ gender) +
+  scale_fill_viridis_d(direction = -1) +
   theme_minimal()
 ```
 
@@ -376,7 +399,7 @@ By the @fig-member-dow-gender-facet-wrap plot it can be seen although the graphs
 
 Maybe with a boxplot, the evidence could be highlighted.
 
-```{r}
+```{r member-dow-gender-box}
 #| label: fig-member-dow-gender-box
 #| fig-cap: "Gender vs day_of_week for Members"
 
@@ -386,6 +409,7 @@ trip_for_analysis %>%
 ggplot(aes(gender, day_of_week, fill = gender)) +
   # geom_jitter(size = 2, alpha = .6) +
   geom_boxplot(show.legend = FALSE, alpha = .3) +
+  scale_fill_viridis_d(direction = -1) +
   theme_minimal()  
 ```
 
@@ -393,7 +417,7 @@ The female gender is a little weekly spreader than the male one.
 
 Some study on age to see its relationship with gender.
 
-```{r}
+```{r member-age-gender-box}
 #| label: fig-member-age-gender-box
 #| fig-cap: "Age vs gender for Members"
 
@@ -403,12 +427,13 @@ trip_for_analysis %>%
 ggplot(aes(gender, age, fill = gender)) +
   # geom_jitter(size = 2, alpha = .6) +
   geom_boxplot(show.legend = FALSE, alpha = .3) +
+  scale_fill_viridis_d(direction = -1) +
   theme_minimal()
 ```
 
 And also for week days by age.
 
-```{r}
+```{r member-age-dow-box}
 #| label: fig-member-age-dow-box
 #| fig-cap: "Age vs day_of_week for Members"
 
@@ -417,9 +442,10 @@ trip_for_analysis %>%
   filter(usertype == "member") %>% 
   mutate(day_of_week = as.factor(day_of_week)) %>% 
   # ggstatsplot::ggbetweenstats(day_of_week, age)
-  ggplot(aes(day_of_week, age)) +
+  ggplot(aes(day_of_week, age, fill = gender)) +
   # geom_jitter(size = 2, alpha = .6) +
-  geom_boxplot(show.legend = FALSE, alpha = .3, fill = "navy", color = "navy") +
+  geom_boxplot(show.legend = TRUE, alpha = .5 ) +
+  scale_fill_viridis_d(direction = -1) +
   theme_minimal()
 ```
 
@@ -442,7 +468,7 @@ ggplot(aes(day_of_week, mth, fill = n)) +
 
 For the variable `ride_length`, it can be notice in the descriptive summary (skim) it is distorted because you have some trips during all day long (\~ 23h). This could be a reading error from the devices for instance. Let's see its histograms to look for any distinction in the last quartile (\]75,100\]) and for the sake of better visualization it will be in logarithm scale and also in minutes (x60) as integer.
 
-```{r}
+```{r usertype-ride-hist-facet-q4}
 #| label: fig-usertype-ride-hist-facet-q4
 #| fig-cap: "Histogram ride_length by User Type - Fourth Quartile (]75,100])"
 
@@ -462,15 +488,15 @@ ggplot(aes(ride_length, fill = usertype)) +
 
 Now let's plot the same for the other quartiles.
 
-```{r}
+```{r usertype-ride-hist-facet-q13}
 #| label: fig-usertype-ride-hist-facet-q13
 #| fig-cap: "Histogram ride_length by User Type - Three first quartiles ([0,75])"
 
 trip_for_analysis %>% 
-  filter(ride_length <= 1182) %>% 
+  filter(ride_length <= quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])[4]) %>% 
   mutate(ride_length = as.integer(ride_length/60)) %>% 
 ggplot(aes(ride_length, fill = usertype)) +
-  geom_histogram(color = "ghostwhite", show.legend = FALSE) +
+  geom_histogram(color = "ghostwhite", show.legend = FALSE, bins = 16) +
   labs(
     y = "",
     x = "ride_length(min)"
@@ -484,16 +510,16 @@ After analysing both graphs, it is clear the different pattern between the user 
 
 Let's see this performance differentiation between business days (days 2, 3, 4, 5 and 6) and weekend days (days 1 and 7) only for the first three quartiles (\<75%).
 
-```{r}
+```{r usertype-daytype-ride-facet-q13}
 #| label: fig-usertype-daytype-ride-facet-q13
 #| fig-cap: "Histogram ride_length by User Type and Type of Day - Three first quartiles ([0,75])"
 
 trip_for_analysis %>% 
-  filter(ride_length <= 1182) %>% 
+  filter(ride_length <= quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])[4]) %>%
   mutate(ride_length = as.integer(ride_length/60),
          day_type = as.factor(if_else(between(day_of_week, 2, 6), "Business Day", "Weekend Day"))) %>% 
 ggplot(aes(ride_length, fill = usertype)) +
-  geom_histogram(color = "ghostwhite", show.legend = FALSE) +
+  geom_histogram(color = "ghostwhite", show.legend = FALSE, bins = 16) +
   labs(
     y = "",
     x = "ride_length(min)"
@@ -505,9 +531,9 @@ ggplot(aes(ride_length, fill = usertype)) +
 
 Well, from the @fig-usertype-daytype-ride-facet-q13 it showed there is no substantial pattern difference between both groups: Business Day and Weekend Day for each user type.
 
-Let's make one more to check if there is any correlation between the user age and the ride length. It used the `viridis` color package to show bigger contrast.
+Let's make one more to check if there is any correlation between the user age and the ride length. It was used the `viridis` color package to show bigger contrast.
 
-```{r}
+```{r usertype-ride-scat-all}
 #| label: fig-usertype-ride-scat-all
 #| fig-cap: "Scatter ride_length vs Age"
 
@@ -527,7 +553,7 @@ ggplot(aes(ride_length, age, color = gender)) +
   theme_minimal()
 ```
 
-For the @fig-usertype-ride-scat-all it can be extracted the fact there is no significant correlation between age and ride length and also that it is the same for both gender.
+For the @fig-usertype-ride-scat-all it can be extracted the fact there is no significant correlation between age and ride length (smooth lines almost parallel) and also that it is the same for both gender.
 
 #### Summary
 
@@ -539,27 +565,29 @@ The typical user is:
 
 Male (`r round(mean(trip_for_analysis$gender[trip_for_analysis$usertype == "member"] == "Male", na.rm = TRUE)*100, 1)`%).
 
-Average Age: `r round(mean(trip_for_analysis$age[trip_for_analysis$usertype == "member"]), 1)`.
+Average Age: `r round(mean(trip_for_analysis$age[trip_for_analysis$usertype == "member"]), 1)` years.
 
 Ride length:
 
 -   Member Users:
 
-    -   Typically under ``` r round(quantile(trip_for_analysis$ride_length[``trip_for_analysis$usertype == "member"``])[4]/60, 0) ``` minutes (75%).
+    -   Typically under `r round(quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])[4]/60, 1)` minutes (75%).
 
-    -   Average: ``` r round(mean(trip_for_analysis$ride_length``[trip_for_analysis$usertype == "member"]``)/60, 1) ``` minutes
+    -   Average: `r round(mean(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])/60, 1)` minutes
 
-    -   Mode: ``` r round(``quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])[3]/60, 0) ``` minutes
+    -   Median: `r round(quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "member"])[3]/60, 1)` minutes
 
 -   Casual Users:
 
-    -   Typically under ``` r round(quantile(trip_for_analysis$ride_length[``trip_for_analysis$usertype == "casual"``])[4]/60, 0) ``` minutes (75%).
+    -   Typically under `r round(quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "casual"])[4]/60, 1)` minutes (75%).
 
-    -   Average: ``` r round(mean(trip_for_analysis$ride_length``[trip_for_analysis$usertype == "casual"]``)/60, 1) ``` minutes
+    -   Average: `r round(mean(trip_for_analysis$ride_length[trip_for_analysis$usertype == "casual"])/60, 1)` minutes
 
-    -   Mode: ``` r round(``quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "casual"])[3]/60, 0) ``` minutes
+    -   Median: `r round(quantile(trip_for_analysis$ride_length[trip_for_analysis$usertype == "casual"])[3]/60, 1)` minutes
 
-Conclusion: casual users do longer trips and mostly on weekends. By the other hand member users do shorter trips mainly on business days. *Maybe it is an idea to identify which users within the casual have the same members pattern and make a direct campaign as bellow. At @tbl-casual-similar-member, it is shown a simple model using the members group, but it can be logistic modeled do determine the best ROC curve to use as a next step*.
+## ANALYSIS SUMMARY
+
+**Conclusion:** casual users do longer trips and mostly on weekends. By the other hand member users do shorter trips mainly on business days and mainly for work. *Maybe it is an idea to identify which users within the casual have the same members pattern and make a direct campaign as bellow filter exemplifies. At @tbl-casual-similar-member, it is shown as simple model using the members group, but it can be logistic modeled do determine the best ROC curve to use as a next step*.
 
 ```{r}
 #| label: tbl-casual-similar-member
